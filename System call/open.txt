@@ -1,0 +1,15 @@
+#include <stdio.h>
+#include <fcntl.h>
+
+int main() {
+    int fd;
+    fd = open("example.txt", O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        return 1;
+    } else {
+        printf("File opened successfully\n");
+        close(fd);
+        return 0;
+    }
+}

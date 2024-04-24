@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <time.h>
+
+void *thread_function(void *arg) {
+    // Kernel thread function
+    // Sleep for 2 seconds
+    sleep(2);
+    pthread_exit(NULL);
+}
+
+int main() {
+    pid_t pid;
+    pthread_t tid;
+    struct timespec start, end;
+    double process_time, thread_time;
+
+    // Capture start time for process creation
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    // Create a new process
+    pid = fork();
+
+    if (pid < 0) {
+        // Fork failed
+        fprintf(stderr, "Fork failed");
+        return 1;
+    } else if (pid == 0) {
+        // Child process
+        // Sleep for 2 seconds
+        sleep(2);
+        exit(0);
+    } else {
+        // Parent process
+        // Capture end time for process creation
+        clock_gettime(CLOCK_MONOTONIC, &end);
+
+        // Calculate time taken for process creation
+        process_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+        printf("Time taken to create process: %f seconds\n", process_time);
+    }
+
+    // Capture start time for kernel thread creation
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    // Create a kernel thread
+    pthread_create(&tid, NULL, thread_function, NULL);
+    pthread_join(tid, NULL);
+
+    // Capture end time for kernel thread creation
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    // Calculate time taken for kernel thread creation
+    thread_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    printf("Time taken to create kernel thread: %f seconds\n", thread_time);
+
+    return 0;
+}

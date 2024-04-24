@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    char buffer[] = "Hello, World!";
+    int fd = open("output.txt", O_WRONLY | O_CREAT, 0644);
+    if (fd == -1) {
+        perror("open");
+        return 1;
+    }
+    int bytes_written = write(fd, buffer, sizeof(buffer) - 1);
+    if (bytes_written == -1) {
+        perror("write");
+        close(fd);
+        return 1;
+    }
+    printf("Data written successfully: %d bytes\n", bytes_written);
+    close(fd);
+    return 0;
+}
